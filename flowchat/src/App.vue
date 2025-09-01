@@ -6,6 +6,8 @@ const flowStore = useFlowStore()
 import FlowChat from '@/components/FlowChat.vue'
 import Suggestions from '@/components/Suggestions.vue'
 
+import ChatSelector from '@/components/_ChatSelector.vue'
+
 /*
  * Todo:
  *
@@ -43,6 +45,8 @@ const startupPrompts = [
     </div>
   </div>
   <!--  <pre>{{ flowStore.flowState }}</pre>-->
+
+  <ChatSelector />
 </template>
 
 <style lang="scss">

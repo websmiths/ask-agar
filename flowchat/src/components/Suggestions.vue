@@ -1,10 +1,10 @@
 <script setup>
 import { useFlowStore } from '@/stores/flow.js'
 import { storeToRefs } from 'pinia'
+const { recommendation, filteredShortlist } = storeToRefs(useFlowStore())
 
 import ProductSuggestion from '@/components/_ProductSuggestion.vue'
 
-const { recommendation, filteredShortlist } = storeToRefs(useFlowStore())
 </script>
 
 <template>
@@ -26,6 +26,8 @@ const { recommendation, filteredShortlist } = storeToRefs(useFlowStore())
         />
       </template>
     </template>
+
+
   </section>
 </template>
 

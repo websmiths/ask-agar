@@ -28,7 +28,12 @@ const badgeClass = score => {
         >{{ product.score }}</span
       >
     </h5>
-    <h6 v-if="product.category" class="text-light">{{ product.category }}</h6>
+    <h6
+      v-if="product.category"
+      class="text-light"
+    >
+      {{ product.category }}
+    </h6>
 
     <p v-if="product.image_url">
       <img
@@ -42,9 +47,9 @@ const badgeClass = score => {
       <a
         :href="product.url"
         target="_blank"
-        class="btn btn-light btn-sm"
+        class="btn btn-light btn-sm w-100 product-link p-y1 px-3"
       >
-        <i class="fa-solid fa-link" />
+        <i class="link-icon" />
         Product link</a
       >
     </p>
@@ -55,6 +60,24 @@ const badgeClass = score => {
 .product-suggestion {
   :last-child {
     margin-bottom: 0;
+  }
+
+  .product-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .link-icon {
+      margin: 0.2rem 0;
+      width: 1rem;
+      height: 1rem;
+      -webkit-mask: url('/link.svg') no-repeat center;
+      -webkit-mask-size: contain;
+      mask: url('/assets/link.svg') no-repeat center;
+      mask-size: contain;
+      background-color: #fcffb7;
+      background-size: contain;
+    }
   }
 }
 </style>
