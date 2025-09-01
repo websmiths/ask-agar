@@ -3,7 +3,13 @@ name: Build and Deploy Vite/Vue App
 on:
   push:
     branches:
-      - master  # or your production branch
+      - master
+  workflow_dispatch:
+    inputs:
+      deploy_env:
+        description: 'Deployment Environment'
+        required: false
+        default: 'production'
 
 jobs:
   build-deploy:
