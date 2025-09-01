@@ -15,7 +15,8 @@ export default defineConfig(({ mode }) => {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
-    base: 'flowchat',
+    // Use your actual public path here
+    base: '/ask-agar/',
     build: {
       rollupOptions: {
         output: {
@@ -23,6 +24,7 @@ export default defineConfig(({ mode }) => {
           assetFileNames: 'flowchat-[name].[ext]',
         },
       },
+      base: 'flowchat',
     },
 
     define: {
