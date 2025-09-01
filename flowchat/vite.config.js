@@ -15,6 +15,7 @@ export default defineConfig(({ mode }) => {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
       },
     },
+    base: 'flowchat',
     build: {
       rollupOptions: {
         output: {
@@ -22,7 +23,6 @@ export default defineConfig(({ mode }) => {
           assetFileNames: 'flowchat-[name].[ext]',
         },
       },
-      outDir: 'flowchat/dist'
     },
 
     define: {
