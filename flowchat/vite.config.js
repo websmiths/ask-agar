@@ -22,6 +22,7 @@ export default defineConfig(({ mode }) => {
           assetFileNames: 'tdn-flowchat-[name].[ext]',
         },
       },
+      outDir: 'flowchat/dist'
     },
 
     define: {
