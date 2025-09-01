@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, onMounted, onUpdated, useId } from 'vue'
+import { computed, ref, onUpdated, useId } from 'vue'
 import { storeToRefs } from 'pinia'
 import slug from 'slug'
 

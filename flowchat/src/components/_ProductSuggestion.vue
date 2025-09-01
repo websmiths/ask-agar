@@ -1,7 +1,4 @@
 <script setup>
-
-import { computed } from 'vue'
-
 const { product } = defineProps({
   product: {
     type: Object,
