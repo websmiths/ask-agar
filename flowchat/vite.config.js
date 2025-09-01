@@ -18,8 +18,8 @@ export default defineConfig(({ mode }) => {
     build: {
       rollupOptions: {
         output: {
-          entryFileNames: 'tdn-flowchat.js',
-          assetFileNames: 'tdn-flowchat-[name].[ext]',
+          entryFileNames: 'flowchat.js',
+          assetFileNames: 'flowchat-[name].[ext]',
         },
       },
       outDir: 'flowchat/dist'
