@@ -219,6 +219,7 @@ const askFlow = prompt => {
         </button>
 
         <button
+          v-if="chatFlow.length > 1"
           type="button"
           class="btn follow-up"
           @click="reset"
