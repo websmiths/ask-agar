@@ -20,11 +20,6 @@ const startupPrompts = [
   'Tell me about Oil Cleaning products',
 ]
 
-const selectedProduct = shallowRef(null)
-
-const handleProductSelection = productKey => {
-  selectedProduct.value = productKey
-}
 </script>
 
 <template>
