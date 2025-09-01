@@ -1,0 +1,61 @@
+@use 'brand';
+
+#flowchat {
+  section {
+
+    h2 {
+      text-align: center;
+      border-color: var(--bs-primary);
+    }
+
+    &.breathe {
+      margin: 10vh 0;
+
+      h2 {
+        margin-bottom: 3vh;
+      }
+
+    }
+  }
+
+
+  .v-enter-active,
+  .v-leave-active {
+    transition: all .6s ease;
+    transform-origin: top left;
+  }
+
+  .v-enter-from,
+  .v-leave-to {
+    opacity: 0;
+    scale: .1;
+    //transform-origin: 5% 5%;
+
+  }
+
+  @keyframes appear {
+    from {
+      opacity: 0;
+      transform: scaleY(.1);
+    }
+    80% {
+      transform: scaleY(1.02);
+    }
+    to {
+      opacity: 1;
+      transform: scaleY(1);
+    }
+  }
+  
+  @keyframes crossfade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+}
+
+
