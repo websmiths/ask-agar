@@ -16,9 +16,9 @@ const badgeClass = score => {
 <template>
   <div class="product-suggestion text-light rounded bg-dark p-3 my-2">
     <!--      <pre class="text-break">{{ product }}</pre>-->
-    <h6
+    <h5
       v-if="product.name"
-      class="d-flex justify-content-between align-items-start"
+      class="d-flex justify-content-between align-items-start text-light"
     >
       <span>{{ product.name }}</span>
       <span
@@ -27,8 +27,8 @@ const badgeClass = score => {
         :class="badgeClass(product.score)"
         >{{ product.score }}</span
       >
-    </h6>
-    <p v-if="product.category">{{ product.category }}</p>
+    </h5>
+    <h6 v-if="product.category" class="text-light">{{ product.category }}</h6>
 
     <p v-if="product.image_url">
       <img
