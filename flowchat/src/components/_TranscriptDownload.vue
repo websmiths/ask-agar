@@ -35,12 +35,14 @@ const generateLead = fields => {
   console.log('name', name)
   console.log('email', email)
 
-  // createLead({ email, name }).catch(e => console.error(e))
+  createLead({ email, name }).catch(e => console.error(e))
 
   dialog.value.close()
   toggleToast()
   setTimeout(toggleToast, 3000)
 }
+
+/*
 
 const downloadTranscript = () => {
   const element = document.getElementById('ask-agar-wrapper')
@@ -85,6 +87,8 @@ function downloadTextFile(text, filename) {
   a.remove()
   setTimeout(() => URL.revokeObjectURL(url), 0)
 }
+*/
+
 </script>
 
 <template>
