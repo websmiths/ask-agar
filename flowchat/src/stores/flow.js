@@ -3,8 +3,8 @@ import { computed, ref, shallowRef } from 'vue'
 
 import { FlowiseClient } from 'flowise-sdk'
 
-import markdownit from 'markdown-it'
-const md = markdownit()
+// import markdownit from 'markdown-it'
+// const md = markdownit()
 
 export const useFlowStore = defineStore('flow', (config = {}) => {
   const {
@@ -13,6 +13,7 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
     // chatId = 'j-event-control',
     initialGreeting = 'Hi there! I’m Agar, your AI assistant for Agar Cleaning Systems. How can I help you today?',
   } = config
+
 
   // basic fetch setup for post
   const basePayload = {
@@ -44,7 +45,9 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
 
   const readingStream = shallowRef(false)
   const currentStream = ref(initialGreeting)
-  const currentStreamOutput = computed(() => currentStream.value.split('<CONCLUSION>').pop())
+  const currentStreamOutput = computed(() =>
+    currentStream.value.split('<CONCLUSION>').pop(),
+  )
   const currentFollowUpPrompts = ref([])
   const flowState = ref({})
 
@@ -94,7 +97,7 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
         console.log('Parsed chunk: ', myChunk)
 
         if (myChunk.type === 'token' && chunk.data) {
-      /*    if (myChunk.data.includes('<CONCLUSION>')) {
+          /*    if (myChunk.data.includes('<CONCLUSION>')) {
             resetFlow = false
             continue
           }

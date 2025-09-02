@@ -167,14 +167,14 @@ const transcript = computed(() => {
           >
             <h4 class="userQuestion">{{ item.question }}</h4>
             <img
-              src="/assets/user-icon.png"
+              src="https://d1bf5c4zvnlohu.cloudfront.net/assets/user-icon.png"
               alt="User"
               class="avatar"
             />
           </div>
           <div class="d-flex gap-2">
             <img
-              src="/assets/agar-icon.png"
+              src="https://d1bf5c4zvnlohu.cloudfront.net/assets/agar-icon.png"
               alt="Agar"
               class="avatar"
             />
@@ -263,11 +263,12 @@ const transcript = computed(() => {
       </div>
     </Transition>
 
+    <TranscriptDownload
+      v-if="chatExpanded"
+      :transcript
+    />
 
-    <TranscriptDownload v-if="chatExpanded" :transcript />
-
-
-<!--    <pre class="text-break">{{ transcript }}</pre>-->
+    <!--    <pre class="text-break">{{ transcript }}</pre>-->
   </section>
 </template>
 

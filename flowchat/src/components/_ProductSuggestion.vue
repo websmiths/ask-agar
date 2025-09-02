@@ -49,7 +49,7 @@ const badgeClass = score => {
         target="_blank"
         class="btn btn-light btn-sm w-100 product-link p-y1 px-3"
       >
-        <i class="link-icon" />
+        <i class="btn-link-icon" />
         Product link</a
       >
     </p>
@@ -67,16 +67,8 @@ const badgeClass = score => {
     align-items: center;
     gap: 0.5rem;
 
-    .link-icon {
-      margin: 0.2rem 0;
-      width: 1rem;
-      height: 1rem;
-      -webkit-mask: url('/link.svg') no-repeat center;
-      -webkit-mask-size: contain;
-      mask: url('/assets/link.svg') no-repeat center;
-      mask-size: contain;
+    .btn-link-icon {
       background-color: #fcffb7;
-      background-size: contain;
     }
   }
 }

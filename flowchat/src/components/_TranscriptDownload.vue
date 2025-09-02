@@ -20,8 +20,13 @@ const openDialog = () => {
   dialog.value.showModal()
 }
 
-const generateLead = fields => {
+const toast = useTemplateRef('liveToast')
+const toggleToast = () => {
+  toast.value.classList.toggle('hide')
+  toast.value.classList.toggle('show')
+}
 
+const generateLead = fields => {
   console.log('generateLead', fields)
 
   const name = fields.target.querySelector('#name').value || ''
@@ -30,11 +35,11 @@ const generateLead = fields => {
   console.log('name', name)
   console.log('email', email)
 
-
-  createLead({ email, name }).catch(e => console.error(e))
+  // createLead({ email, name }).catch(e => console.error(e))
 
   dialog.value.close()
-
+  toggleToast()
+  setTimeout(toggleToast, 3000)
 }
 
 const downloadTranscript = () => {
@@ -85,7 +90,7 @@ function downloadTextFile(text, filename) {
 <template>
   <button
     @click="openDialog"
-    class="btn"
+    class="btn mt-2"
   >
     Email Transcript
   </button>
@@ -140,6 +145,27 @@ function downloadTextFile(text, filename) {
       </div>
     </div>
   </dialog>
+
+
+    <div
+      id="liveToast"
+      ref="liveToast"
+      class="toast hide"
+      role="alert"
+      aria-live="assertive"
+      aria-atomic="true"
+    >
+      <div class="toast-header d-flex justify-content-between align-items-center bg-success text-light">
+        <h6 class="m-0">Thanks</h6>
+        <button
+          type="button"
+          class="ml-2 mb-1 btn-close"
+          aria-label="Close"
+          @click="toggleToast"
+        />
+      </div>
+      <div class="toast-body">Thank you. We will be in touch shortly.</div>
+    </div>
 </template>
 
 <style scoped lang="scss">
@@ -164,8 +190,18 @@ input {
 }
 
 .btn-close {
-  --bs-btn-close-color: #000;
-  --btn-size: .8rem;
+  --bs-btn-close-color: #fff;
+  --btn-size: 0.6rem;
 }
 
+.toast {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 5;
+
+  * {
+    color: inherit;
+  }
+}
 </style>
