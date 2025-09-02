@@ -4,6 +4,8 @@ import { storeToRefs } from 'pinia'
 const { currentChatId } = storeToRefs(useFlowStore())
 
 const chatIds = ['ask-agar-claude', 'j-event-control']
+
+
 </script>
 
 <template>

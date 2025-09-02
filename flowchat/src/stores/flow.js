@@ -44,7 +44,7 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
 
   const readingStream = shallowRef(false)
   const currentStream = ref(initialGreeting)
-  const currentStreamOutput = computed(() => md.render(currentStream.value))
+  const currentStreamOutput = computed(() => currentStream.value.split('<CONCLUSION>').pop())
   const currentFollowUpPrompts = ref([])
   const flowState = ref({})
 
@@ -94,12 +94,11 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
         console.log('Parsed chunk: ', myChunk)
 
         if (myChunk.type === 'token' && chunk.data) {
-          if (myChunk.data.includes('<CONCLUSION>')) {
-            currentStream.value = myChunk.data.split('<CONCLUSION>')[1]
+      /*    if (myChunk.data.includes('<CONCLUSION>')) {
             resetFlow = false
             continue
           }
-
+*/
           if (resetFlow) {
             currentStream.value = chunk.data
             resetFlow = false

@@ -3,6 +3,7 @@ import { computed, ref, onUpdated, useId } from 'vue'
 import { storeToRefs } from 'pinia'
 import slug from 'slug'
 
+import TranscriptDownload from '@/components/_TranscriptDownload.vue'
 // chat-responses
 
 const { startupPrompts } = defineProps({
@@ -104,7 +105,7 @@ const askFlow = prompt => {
   /*agentUserMessage*/
   // append current stream to chatFlow
   if (chatFlow.value.length) {
-    chatFlow.value.at(-1).html = currentStreamOutput.value.toString()
+    chatFlow.value.at(-1).answer = currentStreamOutput.value.toString()
     // reset stream
     currentStream.value = ''
   }
@@ -130,6 +131,23 @@ const askFlow = prompt => {
   // clear input
   flowQuery.value = ''
 }
+
+const transcript = computed(() => {
+  const fullFlow = [...chatFlow.value]
+  fullFlow.at(-1).answer = currentStreamOutput.value
+
+  const compiledTranscript = fullFlow.reduce((acc, item) => {
+    if (item?.question) {
+      acc.push(`### ${item.question}`)
+    }
+    if (item?.answer) {
+      acc.push(`${item.answer}`)
+    }
+    return acc
+  }, [])
+
+  return JSON.stringify(compiledTranscript.join('\n\n'))
+})
 </script>
 <template>
   <section class="flowChat d-flex flex-column">
@@ -161,13 +179,13 @@ const askFlow = prompt => {
               class="avatar"
             />
             <div
-              v-if="item?.html"
-              v-html="item.html"
+              v-if="item?.answer"
+              v-html="md.render(item.answer)"
               class="chatResponse"
             />
             <div
               v-else-if="currentStreamOutput || readingStream"
-              v-html="currentStreamOutput || '…'"
+              v-html="md.render(currentStreamOutput) || '…'"
               class="chatResponse"
             />
           </div>
@@ -244,6 +262,12 @@ const askFlow = prompt => {
         </button>
       </div>
     </Transition>
+
+
+    <TranscriptDownload v-if="chatExpanded" :transcript />
+
+
+<!--    <pre class="text-break">{{ transcript }}</pre>-->
   </section>
 </template>
 

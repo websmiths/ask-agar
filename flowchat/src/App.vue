@@ -86,7 +86,7 @@ const startupPrompts = [
 
     .close-chat {
       position: absolute;
-      right: 0;
+      right: .5rem;
       top: -2rem;
     }
 
