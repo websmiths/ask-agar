@@ -54,7 +54,7 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
   )
   const currentFollowUpPrompts = ref([])
   const flowState = ref({})
-  const feedbackMessage = computed(() => (flowState.value['feedback_message'] || ''))
+  const feedbackMessage = computed(() => (flowState.value?.['feedback_message'] || ''))
 
   const shortlist = shallowRef([])
   const filteredShortlist = computed(() => {
