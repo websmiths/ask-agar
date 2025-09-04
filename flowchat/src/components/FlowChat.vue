@@ -3,6 +3,9 @@ import { computed, ref, onUpdated, useId } from 'vue'
 import { storeToRefs } from 'pinia'
 import slug from 'slug'
 
+import { useGoogleStore } from '@/stores/google.js'
+const { recordQuery } = useGoogleStore()
+
 import TranscriptDownload from '@/components/_TranscriptDownload.vue'
 // chat-responses
 
@@ -73,6 +76,7 @@ const {
   readingStream,
   chatExpanded,
   shortlist,
+  feedbackMessage,
 } = storeToRefs(flowStore)
 const { streamPrediction, resetChat } = flowStore
 
@@ -96,6 +100,8 @@ function reset() {
 const askFlow = prompt => {
   const isPrompt = typeof prompt === 'string'
   question.value = isPrompt ? prompt : flowQuery.value
+
+  recordQuery({ query: question.value, isPrompt })
 
   // reset suggestions if not prompt as the query may relate to a different product
   if (!isPrompt) {
@@ -148,6 +154,9 @@ const transcript = computed(() => {
 
   return JSON.stringify(compiledTranscript.join('\n\n'))
 })
+
+const ellipsis = '<span class="ellipsis"><span>.</span><span>.</span><span>.</span></span>'
+
 </script>
 <template>
   <section class="flowChat d-flex flex-column">
@@ -155,6 +164,7 @@ const transcript = computed(() => {
       :id="wrapperId"
       class="conversation pt-3"
     >
+
       <div id="chat-responses">
         <div
           v-for="item in chatFlow"
@@ -185,7 +195,7 @@ const transcript = computed(() => {
             />
             <div
               v-else-if="currentStreamOutput || readingStream"
-              v-html="md.render(currentStreamOutput) || '…'"
+              v-html="md.render(currentStreamOutput) || feedbackMessage + ellipsis || ellipsis"
               class="chatResponse"
             />
           </div>
@@ -204,7 +214,7 @@ const transcript = computed(() => {
         <button
           v-for="prompt in currentFollowUpPrompts"
           type="button"
-          class="btn btn-sm follow-up"
+          class="btn btn-sm follow-up prompt"
           @click="askFlow(prompt)"
         >
           {{ prompt }}
@@ -255,7 +265,7 @@ const transcript = computed(() => {
         <button
           v-for="prompt in startupPrompts"
           type="button"
-          class="btn btn-sm follow-up"
+          class="btn btn-sm follow-up prompt"
           @click="askFlow(prompt)"
         >
           {{ prompt }}
@@ -361,6 +371,19 @@ const transcript = computed(() => {
     transition: opacity 0.3s ease-in-out;
     &.show {
       opacity: 1;
+    }
+  }
+}
+
+.ellipsis {
+  span {
+    animation: bounce 2s ease-in-out infinite;
+    display: inline-block;
+    &:nth-child(2) {
+      animation-delay: 0.1s;
+    }
+    &:nth-child(3) {
+      animation-delay: 0.2s;
     }
   }
 }

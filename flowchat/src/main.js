@@ -19,3 +19,7 @@ if (document.getElementById('header-search')) {
   app.config.idPrefix = 'app'
   app.use(pinia).mount('#header-search')
 }
+
+document.addEventListener('flow-query', event => {
+  console.log('Flow query: ', event.detail)
+})

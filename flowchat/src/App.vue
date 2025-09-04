@@ -1,5 +1,5 @@
 <script setup>
-import { shallowRef } from 'vue'
+import { watch } from 'vue'
 import { useFlowStore } from '@/stores/flow.js'
 const flowStore = useFlowStore()
 
@@ -21,6 +21,10 @@ const startupPrompts = [
   'Where can I buy Agar products?',
   'Tell me about Oil Cleaning products',
 ]
+
+
+
+
 
 </script>
 
@@ -51,6 +55,9 @@ const startupPrompts = [
 
 <style lang="scss">
 #ask-agar-wrapper {
+
+  color: #000;
+
   &:has(.chat-expanded) {
     position: fixed;
     width: 100%;
@@ -59,7 +66,7 @@ const startupPrompts = [
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 2;
+    z-index: 9999;
     background: rgba(0, 0, 0, 0.5);
   }
 

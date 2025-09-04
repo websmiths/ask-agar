@@ -1,7 +1,9 @@
 import { defineStore } from 'pinia'
-import { computed, ref, shallowRef } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 
 import { FlowiseClient } from 'flowise-sdk'
+
+import { useGoogleStore } from '@/stores/google.js'
 
 // import markdownit from 'markdown-it'
 // const md = markdownit()
@@ -14,6 +16,7 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
     initialGreeting = 'Hi there! I’m Agar, your AI assistant for Agar Cleaning Systems. How can I help you today?',
   } = config
 
+  const googleStore = useGoogleStore()
 
   // basic fetch setup for post
   const basePayload = {
@@ -24,6 +27,7 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
   }
 
   const chatExpanded = shallowRef(false)
+  watch(chatExpanded, open => googleStore.tagFlowChat(open))
 
   const currentChatId = shallowRef(chatId)
   const agentFlows = new Map([
@@ -50,6 +54,7 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
   )
   const currentFollowUpPrompts = ref([])
   const flowState = ref({})
+  const feedbackMessage = computed(() => (flowState.value['feedback_message'] || ''))
 
   const shortlist = shallowRef([])
   const filteredShortlist = computed(() => {
@@ -90,6 +95,7 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
         if (chunk.event === 'end') {
           console.log('end')
           readingStream.value = false
+          feedbackMessage.value = ''
           return
         }
 
@@ -275,6 +281,7 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
     recommendation,
     currentFollowUpPrompts,
     flowState,
+    feedbackMessage,
     currentChatId,
     question,
     overrideConfig,
