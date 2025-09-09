@@ -165,13 +165,12 @@ onMounted(() => {
 
     <ChatSelector />
   </div>
-  <!--  <pre>{{ flowStore.flowState }}</pre>-->
 </template>
 
 <style lang="scss">
 :root {
   --handle-w: 8px;
-  --min-left: 25; /* % */
+  --min-left: 50; /* % */
   --max-left: 85; /* % */
 }
 
