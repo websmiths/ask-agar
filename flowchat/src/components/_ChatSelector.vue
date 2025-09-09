@@ -3,35 +3,41 @@ import { useFlowStore } from '@/stores/flow.js'
 import { storeToRefs } from 'pinia'
 const { currentChatId } = storeToRefs(useFlowStore())
 
-const chatIds = ['ask-agar-claude', 'j-event-control']
-
-
+const chatIds = [{id: 'ask-agar-claude', label: 'Ask Agar - Claude'}, {id:'j-event-control', label: 'Julian – experiment 2'}]
 </script>
 
 <template>
   <div
-    class="btn-group btn-group-toggle fixed-bottom"
-    data-toggle="buttons"
+    id="chat-selector"
+    class="button-group"
   >
     <button
       v-for="chat in chatIds"
-      :key="chat"
-      class="btn btn-sm"
+      :key="chat.id"
       :class="{
-        'inactive': chat !== currentChatId,
+        'button-secondary': chat.id === currentChatId,
       }"
-      @click="currentChatId = chat"
+      @click="currentChatId = chat.id"
     >
-      {{ chat }}
+      {{ chat.label }}
     </button>
   </div>
 </template>
 
 <style scoped lang="scss">
-.inactive {
-  background: #341e1b;
-  &:hover {
-    background: var(--bs-tertiary);
+#chat-selector {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  display: flex;
+  justify-content: stretch;
+  gap: 0;
+  z-index: 100;
+
+  > * {
+    flex: 1;
   }
 }
 </style>

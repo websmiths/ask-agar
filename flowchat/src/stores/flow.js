@@ -5,8 +5,8 @@ import { FlowiseClient } from 'flowise-sdk'
 
 import { useGoogleStore } from '@/stores/google.js'
 
-// import markdownit from 'markdown-it'
-// const md = markdownit()
+import markdownit from 'markdown-it'
+const md = markdownit()
 
 export const useFlowStore = defineStore('flow', (config = {}) => {
   const {
@@ -47,15 +47,40 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
     baseUrl: 'https://flowise-agar.3dn.com.au',
   })
 
+  const overrideConfig = ref({})
+
+  /* Stream-related variables*/
   const readingStream = shallowRef(false)
+
+  // current iteration
   const currentStream = ref(initialGreeting)
   const currentStreamOutput = computed(() =>
     currentStream.value.split('<CONCLUSION>').pop(),
   )
-  const currentFollowUpPrompts = ref([])
-  const flowState = ref({})
-  const feedbackMessage = computed(() => (flowState.value?.['feedback_message'] || ''))
 
+  // follow up
+  const currentFollowUpPrompts = ref([])
+
+  // capture flow state variables
+  const flowState = ref({})
+
+  // handle feedback_message (progress updates) in flow state
+  const feedbackMessage = computed(
+    () => flowState.value?.['feedback_message'] || '',
+  )
+  const compiledFeedbackMessages = ref([])
+  watch(feedbackMessage, message =>
+    compiledFeedbackMessages.value.push(message),
+  )
+
+  // extract extra_info (for RHS area) from flow state
+  const extraInfo = computed(() => {
+    const extraInfo = flowState.value?.['extra_info'] || null
+    if (!extraInfo) return null
+    return extraInfo.map(item => md.render(item))
+  })
+
+  // products shortlist
   const shortlist = shallowRef([])
   const filteredShortlist = computed(() => {
     // return shortlist.value
@@ -64,6 +89,11 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
       return item && item.name !== recommendation.value.name
     })
   })
+
+  // handle stream errors (e.g. overload error)
+  // const streamError = shallowRef(false)
+
+  // product recommendation
   const recommendation = shallowRef({})
 
   function resetChat() {
@@ -81,11 +111,16 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
     let resetFlow = false
 
     try {
+      if (sessionId.value) {
+        overrideConfig.value.sessionId = sessionId.value
+      }
+
       // For streaming prediction
       const predictionStream = await flowClient.createPrediction({
         chatflowId: flowId.value,
         question: question.value,
         streaming: true,
+        overrideConfig: overrideConfig.value,
       })
 
       for await (const chunk of predictionStream) {
@@ -96,6 +131,14 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
           console.log('end')
           readingStream.value = false
           feedbackMessage.value = ''
+          compiledFeedbackMessages.value = []
+          return
+        }
+
+        if (chunk.event === 'error' || (typeof chunk.data === 'string' && /overload|error/i.test(chunk.data))) {
+          // streamError.value = true
+          readingStream.value = false
+          feedbackMessage.value = 'Apologies, we seem to have hit a problem. Please try again.'
           return
         }
 
@@ -165,6 +208,10 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
       flowState.value = chunk.data.pop().data.state
     }
 
+    if (chunk.event === 'metadata' && chunk.data?.sessionId) {
+      sessionId.value = chunk.data.sessionId
+    }
+
     if (Array.isArray(myChunk.data)) {
       myChunk.data = myChunk.data.map(item => {
         const theItem = {
@@ -194,8 +241,6 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
 
     return myChunk
   }
-
-  const overrideConfig = ref({})
 
   const fetching = shallowRef(null)
 
@@ -282,6 +327,8 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
     currentFollowUpPrompts,
     flowState,
     feedbackMessage,
+    extraInfo,
+    compiledFeedbackMessages,
     currentChatId,
     question,
     overrideConfig,

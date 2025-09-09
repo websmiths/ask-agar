@@ -1,66 +1,38 @@
+@use 'sass:color';
+
+$brand-primary: #D12127;
+$brand-secondary: #218F34;
+$brand-tertiary: #F6EB16;
+
+$brand-grey: #343a40;
+$brand-grey-light: #837b7b;
+$brand-light: #f8f9fa;
+
+$brand-danger: color.adjust($brand-primary, $saturation: -20%);
+$brand-success: color.adjust($brand-secondary, $saturation: -5%);
+$brand-warning: color.adjust($brand-tertiary, $saturation: -20%);
+$brand-info: #1481d5;
+
+
 :root {
-  --bs-primary: #d12127;
-  --bs-secondary: #f6eb16;
-  --bs-tertiary: #218f34;
+  --brand-primary: #{$brand-primary};
+  --brand-secondary: #{$brand-secondary};
+  --brand-tertiary: #{$brand-tertiary};
 
-  --bs-light: #f8f9fa;
+  --brand-grey: #{$brand-grey};
+  --brand-grey-light: #{$brand-grey-light};
+  --brand-light: #{$brand-light};
+
+
+  --brand-border-radius: 0.25rem;
+
+  --brand-success: #{$brand-success};
+  --brand-danger: #{$brand-danger};
+  --brand-warning: #{$brand-warning};
+  --brand-info: #{$brand-info};
+
 }
 
-.gap-1 {
-  gap: 0.3rem !important;
-}
-
-.gap-2 {
-  gap: 0.5rem !important;
-}
-
-.btn-sm {
-  font-weight: normal;
-  font-size: 0.8rem;
-}
-
-.btn-close {
-  --bs-btn-close-color: #fff;
-  --btn-size: 0.8rem;
-  //--bs-btn-close-filter: var(--bs-btn-close-color);
-  --bs-btn-close-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414'/%3e%3c/svg%3e");
-  --bs-btn-close-opacity: 0.7;
-  --bs-btn-close-hover-opacity: 1;
-  --bs-btn-close-focus-shadow: 0 0 0 0.25rem rgba(209, 33, 39, 0.25);
-  --bs-btn-close-focus-opacity: 1;
-  --bs-btn-close-disabled-opacity: 0.25;
-  box-sizing: content-box;
-  //padding: 0.25em 0.25em;
-  color: var(--bs-btn-close-color);
-  //background: transparent var(--bs-btn-close-bg) center/1em auto no-repeat;
-  filter: var(--bs-btn-close-filter);
-  border: 0;
-  border-radius: 0.375rem;
-
-  opacity: var(--bs-btn-close-opacity);
-
-  width: var(--btn-size);
-  height: var(--btn-size);
-  margin: 0.2rem 0;
-  padding: 0.25em;
-  -webkit-mask: var(--bs-btn-close-bg) no-repeat center;
-  -webkit-mask-size: contain;
-  mask: var(--bs-btn-close-bg) no-repeat center;
-  mask-size: contain;
-  background-color: var(--bs-btn-close-color);
-  background-size: contain;
-}
-
-.btn-link-icon {
-  --icon-link: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'><title>link</title><style>path{fill:currentColor;}</style><path d='M4.83 15h2.91a4.88 4.88 0 0 1-1.55-2H5a3 3 0 1 1 0-6h3a3 3 0 0 1 2.82 4h2.1a4.82 4.82 0 0 0 .08-.83v-.34A4.83 4.83 0 0 0 8.17 5H4.83A4.83 4.83 0 0 0 0 9.83v.34A4.83 4.83 0 0 0 4.83 15z'/><path d='M15.17 5h-2.91a4.88 4.88 0 0 1 1.55 2H15a3 3 0 1 1 0 6h-3a3 3 0 0 1-2.82-4h-2.1a4.82 4.82 0 0 0-.08.83v.34A4.83 4.83 0 0 0 11.83 15h3.34A4.83 4.83 0 0 0 20 10.17v-.34A4.83 4.83 0 0 0 15.17 5z'/></svg>");
-
-  --btn-size: 1rem;
-  width: var(--btn-size);
-  height: var(--btn-size);
-  -webkit-mask: var(--icon-link) no-repeat center;
-  -webkit-mask-size: contain;
-  mask: var(--icon-link) no-repeat center;
-  mask-size: contain;
-  background-color: var(--bs-btn-close-color);
-  background-size: contain;
+body {
+  font-family: 'Open Sans', Arial, sans-serif;
 }

@@ -1,6 +1,6 @@
 #flowchat section h2 {
   text-align: center;
-  border-color: var(--bs-primary);
+  border-color: var(--brand-primary);
 }
 #flowchat section.breathe {
   margin: 10vh 0;

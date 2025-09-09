@@ -88,13 +88,12 @@ function downloadTextFile(text, filename) {
   setTimeout(() => URL.revokeObjectURL(url), 0)
 }
 */
-
 </script>
 
 <template>
   <button
     @click="openDialog"
-    class="btn mt-2"
+    class="button-secondary"
   >
     Email Transcript
   </button>
@@ -103,9 +102,9 @@ function downloadTextFile(text, filename) {
     id="get-details"
     ref="get-details"
   >
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Email Transcript</h5>
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <h5>Email Transcript</h5>
         <button
           type="button"
           class="btn-close"
@@ -113,13 +112,13 @@ function downloadTextFile(text, filename) {
           aria-label="Close"
         ></button>
       </div>
-      <div class="modal-body">
+      <div class="dialog-body">
         <p>
           Enter your details and we’ll send you a link to download your
           transcript.
         </p>
         <form @submit.prevent="generateLead">
-          <p class="d-flex gap-2">
+          <p class="input-group">
             <label for="name">Name</label>
             <input
               id="name"
@@ -127,7 +126,7 @@ function downloadTextFile(text, filename) {
               placeholder="Enter your name"
             />
           </p>
-          <p class="d-flex gap-2">
+          <p class="input-group">
             <label for="email">Email</label>
             <input
               id="email"
@@ -140,7 +139,7 @@ function downloadTextFile(text, filename) {
           <p>
             <button
               type="submit"
-              class="btn w-100"
+              class="button-secondary"
             >
               Submit
             </button>
@@ -150,62 +149,97 @@ function downloadTextFile(text, filename) {
     </div>
   </dialog>
 
-
-    <div
-      id="liveToast"
-      ref="liveToast"
-      class="toast hide"
-      role="alert"
-      aria-live="assertive"
-      aria-atomic="true"
-    >
-      <div class="toast-header d-flex justify-content-between align-items-center bg-success text-light">
-        <h6 class="m-0">Thanks</h6>
-        <button
-          type="button"
-          class="ml-2 mb-1 btn-close"
-          aria-label="Close"
-          @click="toggleToast"
-        />
-      </div>
-      <div class="toast-body">Thank you. We will be in touch shortly.</div>
+  <div
+    ref="liveToast"
+    class="toast-message hide"
+    role="alert"
+    aria-live="assertive"
+    aria-atomic="true"
+  >
+    <div class="toast-message-header">
+      <h6 class="m-0">Thanks</h6>
+      <button
+        type="button"
+        class="ml-2 mb-1 btn-close"
+        aria-label="Close"
+        @click="toggleToast"
+      />
     </div>
+    <div class="toast-message-body">
+      Thank you. We will be in touch shortly.
+    </div>
+  </div>
 </template>
 
 <style scoped lang="scss">
+@use '../assets/scss/mixins';
+
 dialog {
-  background: transparent;
+  //background: transparent;
   border: none;
+  box-shadow: 0 0 0.3rem rgba(0, 0, 0, 0.5);
+  margin: auto;
+  border-radius: var(--dialog-border-radius);
+  padding: 0;
 }
 
 ::backdrop {
-  background-image: linear-gradient(
-    45deg,
-    magenta,
-    rebeccapurple,
-    dodgerblue,
-    green
-  );
+  background-image: linear-gradient(45deg, #222, #111, #222);
   opacity: 0.75;
 }
 
-input {
-  width: 100%;
+.dialog-header {
+  @include mixins.flex-header;
+  border-radius: var(--dialog-border-radius) var(--dialog-border-radius) 0 0;
+  background-color: var(--brand-grey-light);
+  padding: 0.5rem 1rem;
+
+  h5 {
+    font-size: 1.2rem;
+    margin: 0;
+    color: var(--brand-light);
+  }
+}
+
+.dialog-body {
+  padding: 1rem;
 }
 
 .btn-close {
-  --bs-btn-close-color: #fff;
+  --button-close-color: #fff;
   --btn-size: 0.6rem;
 }
 
-.toast {
+.toast-message {
   position: fixed;
   top: 1rem;
   right: 1rem;
   z-index: 5;
+  border-radius: 0.25rem;
+  opacity: 0.8;
+  background-color: var(--brand-light);
+
+  &.hide {
+    display: none;
+  }
+  &.show {
+    display: block;
+  }
 
   * {
     color: inherit;
+  }
+
+  .toast-message-header {
+    @include mixins.flex-header;
+    background-color: var(--brand-secondary);
+    color: var(--brand-light);
+    padding: 0.5rem 1rem;
+  }
+
+  .toast-message-body {
+    padding: 1rem;
+    font-size: 0.9rem;
   }
 }
 </style>

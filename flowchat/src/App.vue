@@ -1,5 +1,5 @@
 <script setup>
-import { watch } from 'vue'
+import { useTemplateRef } from 'vue'
 import { useFlowStore } from '@/stores/flow.js'
 const flowStore = useFlowStore()
 
@@ -22,22 +22,136 @@ const startupPrompts = [
   'Tell me about Oil Cleaning products',
 ]
 
+const chatContainer = useTemplateRef('chatContainer')
 
+// Place this in your <script setup> block or a separate JS file
+import { onMounted } from 'vue'
 
+function closeChat() {
+  flowStore.chatExpanded = false
+  chatContainer.value.removeAttribute('style')
+}
 
+onMounted(() => {
+  const container = document.querySelector('.chat-interface')
+  const handle = document.getElementById('drag-handle')
 
+  const clamp = (v, min, max) => Math.max(min, Math.min(max, v))
+
+  function setColumns(leftPercent) {
+    if (!flowStore.chatExpanded) return
+    const rect = container.getBoundingClientRect()
+    const handlePx = handle.offsetWidth // fixed
+    const left = clamp(
+      leftPercent,
+      parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue(
+          '--min-left',
+        ),
+      ),
+      parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue(
+          '--max-left',
+        ),
+      ),
+    )
+    const right = 100 - left - (handlePx / rect.width) * 100
+    container.style.gridTemplateColumns = `${left}% ${handlePx}px ${right}%`
+  }
+
+  // ----- Mouse drag -----
+  let dragging = false
+
+  function onMouseDown(e) {
+    if (!flowStore.chatExpanded) return
+    dragging = true
+    container.classList.add('dragging')
+    window.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('mouseup', onMouseUp, { once: true })
+  }
+
+  function onMouseMove(e) {
+    if (!dragging) return
+    const rect = container.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const leftPct = (x / rect.width) * 100
+    setColumns(leftPct)
+  }
+
+  function onMouseUp() {
+    dragging = false
+    container.classList.remove('dragging')
+    window.removeEventListener('mousemove', onMouseMove)
+  }
+
+  handle.addEventListener('mousedown', onMouseDown)
+
+  // ----- Touch drag -----
+  function onTouchStart(e) {
+    e.preventDefault()
+    dragging = true
+    container.classList.add('dragging')
+    window.addEventListener('touchmove', onTouchMove, { passive: false })
+    window.addEventListener('touchend', onTouchEnd, { once: true })
+    window.addEventListener('touchcancel', onTouchEnd, { once: true })
+  }
+
+  function onTouchMove(e) {
+    if (!dragging) return
+    const t = e.touches[0]
+    const rect = container.getBoundingClientRect()
+    const x = t.clientX - rect.left
+    const leftPct = (x / rect.width) * 100
+    setColumns(leftPct)
+  }
+
+  function onTouchEnd() {
+    dragging = false
+    container.classList.remove('dragging')
+    window.removeEventListener('touchmove', onTouchMove)
+  }
+
+  handle.addEventListener('touchstart', onTouchStart, { passive: false })
+
+  /*
+    // ----- Keyboard (accessibility) -----
+    handle.addEventListener('keydown', e => {
+      const step = e.shiftKey ? 5 : 2 // arrow = 2%, shift+arrow = 5%
+      const [leftValue] =
+        getComputedStyle(container).gridTemplateColumns.split(' ')
+      let left = parseFloat(leftValue) // assumes % for the first track
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        setColumns(left - step)
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault()
+        setColumnsft + step)
+      }
+    })
+  /*
+    // Keep layout responsive when container resizes
+    new ResizeObserver(() => {
+      console.log('resize')
+      if (!flowStore.chatExpanded) return
+      const [leftValue] =
+        getComputedStyle(container).gridTemplateColumns.split(' ')
+      setColumns(parseFloat(leftValue))
+    }).observe(container)
+    */
+})
 </script>
 
 <template>
-  <div id="ask-agar-wrapper">
+  <div id="flowChat">
     <div
       class="chat-interface"
+      ref="chatContainer"
       :class="{ 'chat-expanded': flowStore.chatExpanded }"
     >
       <div class="close-chat">
         <button
           class="btn-close"
-          @click="flowStore.chatExpanded = false"
+          @click="closeChat"
         />
       </div>
       <FlowChat
@@ -45,17 +159,23 @@ const startupPrompts = [
         submit-label="Ask Agar"
         :startup-prompts
       />
-      <Suggestions class="suggestions" />
+      <div id="drag-handle"></div>
+      <Suggestions />
     </div>
+
+    <ChatSelector />
   </div>
   <!--  <pre>{{ flowStore.flowState }}</pre>-->
-
-  <ChatSelector />
 </template>
 
 <style lang="scss">
-#ask-agar-wrapper {
+:root {
+  --handle-w: 8px;
+  --min-left: 25; /* % */
+  --max-left: 85; /* % */
+}
 
+#flowChat {
   color: #000;
 
   &:has(.chat-expanded) {
@@ -70,79 +190,107 @@ const startupPrompts = [
     background: rgba(0, 0, 0, 0.5);
   }
 
-
   .btn {
     height: unset !important;
   }
 
-
   .chat-interface {
-    display: flex;
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: 100%;
     gap: 0;
     height: 3rem;
-    top: 0;
+    bottom: 2px;
     border-radius: 0.3em;
+    margin-left: 2rem;
 
     // to reset some agar stuff
     text-align: left;
 
-    //transition: height 0.6s ease-in-out;
-    transition: all 0.6s ease-in-out;
+    transition:
+      grid-template-columns 120ms ease,
+      height 0.5s ease-in-out;
 
     position: relative;
 
     .close-chat {
       position: absolute;
-      right: .5rem;
+      right: 0.5rem;
       top: -2rem;
     }
 
     &.chat-expanded {
+      grid-template-columns: 80% var(--handle-w) calc(20% - var(--handle-w));
       height: 80vh;
       width: 80vw;
       margin: 0 auto;
       background: #fff;
       padding: 1rem;
-      gap: 1rem;
       top: 3rem;
     }
 
     .suggestions,
     .close-chat,
     .conversation {
-      transition: all 0.6s ease-in-out;
+      transition: opacity 0.6s ease-in-out;
     }
 
     &:not(.chat-expanded) {
+      #drag-handle,
       .suggestions,
       .close-chat,
       .conversation {
         opacity: 0;
-        //height: 0;
         margin: 0;
         padding: 0;
-      }
-
-      .suggestions {
-        flex: 0 1 0;
-        padding: 0;
+        transition: opacity 0.3s ease-in-out;
       }
     }
 
-    > section {
-      flex: 1 1 auto;
+    #drag-handle {
+      position: relative;
+      width: var(--handle-w);
+      cursor: col-resize;
 
-      &.chat {
-        flex-basis: 80%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 20px;
+
+      background-color: #fff;
+      transition:
+        background-color 0.6s ease-in-out,
+        border 0.6s ease-in-out;
+
+      &:hover {
+        background-color: #e5e7eb;
       }
 
-      &.suggestions {
-        flex-basis: 20%;
-        padding: 1rem;
-        border-radius: 0.4em;
-        border: 1px solid var(--bs-primary);
-        background: var(--bs-primary);
+      &::before {
+        content: '';
+        width: 2px;
+        height: 24px;
+        box-shadow:
+          0 -10px 0 0 #94a3b8,
+          0 -5px 0 0 #94a3b8,
+          0 0 0 0 #94a3b8,
+          0 5px 0 0 #94a3b8,
+          0 10px 0 0 #94a3b8;
+        border-radius: 1px;
+        opacity: 0.6;
+        pointer-events: none;
       }
+
+      &:hover {
+        cursor: ew-resize;
+      }
+    }
+
+    section.suggestions {
+      padding: 1rem;
+      border-radius: 0.4em;
+      border: 1px solid var(--brand-primary);
+      background: var(--brand-primary);
     }
   }
 }
