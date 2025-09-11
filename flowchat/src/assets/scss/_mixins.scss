@@ -37,12 +37,12 @@
 
 @mixin svg-mask-icon {
     --icon-link: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'></svg>");
-    --button-size: 1rem;
+    --icon-size: 1rem;
     --icon-colour: #fff;
     --icon-opacity: 1;
 
-    width: var(--button-size);
-    height: var(--button-size);
+    width: var(--icon-size);
+    height: var(--icon-size);
 
     -webkit-mask: var(--icon-link) no-repeat center;
     -webkit-mask-size: contain;

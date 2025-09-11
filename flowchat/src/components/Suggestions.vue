@@ -10,23 +10,27 @@ import ProductSuggestion from '@/components/_ProductSuggestion.vue'
 <template>
   <section class="suggestions">
     <div class="product-suggestions">
-      <template v-if="recommendation.name || filteredShortlist.length">
+      <div
+        v-if="recommendation"
+        class="recommended-product"
+      >
         <h4>Suggested product</h4>
         <ProductSuggestion
           v-if="recommendation"
           :product="recommendation"
         />
-
-        <template v-if="filteredShortlist.length">
-          <h5 class="mt-4">Shortlisted alternatives</h5>
-
-          <ProductSuggestion
-            v-for="product in filteredShortlist"
-            :key="product.name"
-            :product="product"
-          />
-        </template>
-      </template>
+      </div>
+      <div
+        v-if="filteredShortlist.length"
+        class="shortlist"
+      >
+        <h5>Shortlist</h5>
+        <ProductSuggestion
+          v-for="product in filteredShortlist"
+          :key="product.name"
+          :product="product"
+        />
+      </div>
     </div>
 
     <div class="extra-info">
@@ -53,6 +57,11 @@ import ProductSuggestion from '@/components/_ProductSuggestion.vue'
   gap: 1rem;
   justify-content: space-between;
 
+  .recommended-product,
+  .shortlist {
+    margin-bottom: 1rem;
+  }
+
   .extra-info-item {
     background: var(--brand-light);
     padding: 0.5rem;
@@ -61,6 +70,5 @@ import ProductSuggestion from '@/components/_ProductSuggestion.vue'
     color: var(--brand-grey);
     margin-bottom: 0.5rem;
   }
-
 }
 </style>

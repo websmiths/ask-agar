@@ -7,8 +7,9 @@ import { useGoogleStore } from '@/stores/google.js'
 const { recordQuery } = useGoogleStore()
 
 import TranscriptDownload from '@/components/_TranscriptDownload.vue'
-import ProgressFeedback from '@/components/_ProgressFeedback.vue'
-import EllipsisBounce from '@/components/_EllipsisBounce.vue'
+import BotResponse from '@/components/_BotResponse.vue'
+import PromptButtons from '@/components/_PromptButtons.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const { startupPrompts } = defineProps({
   startupPrompts: {
@@ -72,17 +73,11 @@ const {
   currentStreamOutput,
   currentStream,
   currentFollowUpPrompts,
-  readingStream,
   chatExpanded,
   shortlist,
-  compiledFeedbackMessages,
+  chatMeta,
 } = storeToRefs(flowStore)
 const { streamPrediction, resetChat } = flowStore
-
-import markdownit from 'markdown-it'
-const md = markdownit()
-
-import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const flowQuery = ref('')
 const chatFlow = ref([{}])
@@ -111,6 +106,8 @@ const askFlow = prompt => {
   // append current stream to chatFlow
   if (chatFlow.value.length) {
     chatFlow.value.at(-1).answer = currentStreamOutput.value.toString()
+    chatFlow.value.at(-1).chatMeta = chatMeta.value
+
     // reset stream
     currentStream.value = ''
   }
@@ -118,18 +115,9 @@ const askFlow = prompt => {
   const chatItem = {
     question: question.value,
     id: slug(question.value),
+    feedback: null,
   }
   chatFlow.value.push(chatItem)
-  /*
-
-  // create a lead if an email is found in the question
-  const emailPattern = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}/
-  const emailMatch = question.value.match(emailPattern)
-  if (emailMatch && !capturedResources.value.includes(emailMatch[0])) {
-    capturedResources.value.push(emailMatch[0])
-    createLead({ email: emailMatch[0] }).catch(e => console.error(e))
-  }
-*/
 
   streamPrediction()
 
@@ -153,11 +141,6 @@ const transcript = computed(() => {
 
   return JSON.stringify(compiledTranscript.join('\n\n'))
 })
-
-const renderedFeedback = computed(() => {})
-
-const ellipsis =
-  '<span class="ellipsis"><span>.</span><span>.</span><span>.</span></span>'
 </script>
 <template>
   <section class="flowChat">
@@ -167,7 +150,7 @@ const ellipsis =
     >
       <div id="chat-responses">
         <div
-          v-for="item in chatFlow"
+          v-for="(item, index) in chatFlow"
           class="response"
           :id="item.id"
         >
@@ -175,42 +158,19 @@ const ellipsis =
             v-if="item.question"
             class="chat-item-user"
           >
-            <h4 class="userQuestion">{{ item.question }}</h4>
+            <h4 class="userQuestion" v-html="item.question.replace(/\n/g, '<br/>')" />
             <img
               src="https://d1bf5c4zvnlohu.cloudfront.net/assets/user-icon.png"
               alt="User"
               class="avatar"
             />
           </div>
-          <div class="chat-item-bot">
-            <img
-              src="https://d1bf5c4zvnlohu.cloudfront.net/assets/agar-icon.png"
-              alt="Agar"
-              class="avatar"
-            />
-            <div
-              v-if="item?.answer"
-              v-html="md.render(item.answer)"
-              class="chatResponse"
-            />
-            <div
-              v-else-if="compiledFeedbackMessages.length"
-              class="chatResponse"
-            >
-              <ProgressFeedback />
-            </div>
-            <div
-              v-else-if="currentStreamOutput"
-              v-html="md.render(currentStreamOutput)"
-              class="chatResponse"
-            />
-            <div
-              v-else-if="readingStream"
-              class="chatResponse"
-            >
-              <EllipsisBounce />
-            </div>
-          </div>
+
+          <BotResponse
+            :item="item"
+            :is-current="index === chatFlow.length - 1"
+            @submit:follow-up="askFlow($event)"
+          />
         </div>
       </div>
 
@@ -219,19 +179,10 @@ const ellipsis =
         loading-message="Asking our agents…"
       />
 
-      <div
-        v-if="currentFollowUpPrompts.length"
-        class="follow-up-questions"
-      >
-        <button
-          v-for="prompt in currentFollowUpPrompts"
-          type="button"
-          class="follow-up prompt"
-          @click="askFlow(prompt)"
-        >
-          {{ prompt }}
-        </button>
-      </div>
+      <PromptButtons
+        :prompts="currentFollowUpPrompts"
+        @ask-flow="askFlow"
+      />
     </div>
 
     <form
@@ -271,19 +222,11 @@ const ellipsis =
     </form>
 
     <Transition appear>
-      <div
+      <PromptButtons
         v-if="chatExpanded && showStartupPrompts"
-        class="follow-up-questions"
-      >
-        <button
-          v-for="prompt in startupPrompts"
-          type="button"
-          class="follow-up prompt"
-          @click="askFlow(prompt)"
-        >
-          {{ prompt }}
-        </button>
-      </div>
+        :prompts="startupPrompts"
+        @ask-flow="askFlow"
+      />
     </Transition>
 
     <TranscriptDownload
@@ -349,14 +292,6 @@ const ellipsis =
         border-radius: 0.3rem;
         border-style: solid;
         border-width: 1px;
-
-        > :first-child {
-          margin-top: 0;
-        }
-
-        > :last-child {
-          margin-bottom: 0;
-        }
       }
 
       .userQuestion {
@@ -398,7 +333,7 @@ const ellipsis =
 
 .follow-up {
   font-weight: 400;
-  font-size: .9em;
+  font-size: 0.9em;
 
   background: #d8d2d2;
   color: #000;

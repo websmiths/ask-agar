@@ -151,7 +151,7 @@ const badgeClass = score => {
     }
 
     .download-icon {
-      --button-size: 0.7rem;
+      --icon-size: 0.7rem;
       bottom: 0;
       margin-right: .4rem;
     }

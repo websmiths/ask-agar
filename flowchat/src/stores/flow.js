@@ -37,6 +37,9 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
   ])
 
   const flowId = computed(() => agentFlows.get(currentChatId.value))
+
+  const chatMeta = ref(null)
+
   const sessionId = shallowRef(null)
 
   // User's current question
@@ -81,20 +84,21 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
   })
 
   // products shortlist
-  const shortlist = shallowRef([])
+  const shortlist = ref([])
   const filteredShortlist = computed(() => {
-    // return shortlist.value
     if (!recommendation.value?.name) return shortlist.value
     return shortlist.value.filter(item => {
-      return item && item.name !== recommendation.value.name
+      return item && item?.name !== recommendation.value.name
     })
   })
+
+  const followUpQuestions = ref([])
 
   // handle stream errors (e.g. overload error)
   // const streamError = shallowRef(false)
 
   // product recommendation
-  const recommendation = shallowRef({})
+  const recommendation = shallowRef(null)
 
   function resetChat() {
     currentStream.value = initialGreeting
@@ -110,9 +114,12 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
 
     let resetFlow = false
 
+    // reset previous
+    followUpQuestions.value = []
+
     try {
-      if (sessionId.value) {
-        overrideConfig.value.sessionId = sessionId.value
+      if (chatMeta.value?.sessionId) {
+        overrideConfig.value.sessionId = chatMeta.value.sessionId
       }
 
       // For streaming prediction
@@ -126,19 +133,23 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
       for await (const chunk of predictionStream) {
         // console.log('Raw chunk: ', chunk)
 
-        // {event: "token", data: "hello"}
         if (chunk.event === 'end') {
           console.log('end')
           readingStream.value = false
-          feedbackMessage.value = ''
           compiledFeedbackMessages.value = []
           return
         }
 
-        if (chunk.event === 'error' || (typeof chunk.data === 'string' && /overload|error/i.test(chunk.data))) {
+        if (
+          chunk.event === 'error' ||
+          (typeof chunk.data === 'string' && /overload|error/i.test(chunk.data))
+        ) {
           // streamError.value = true
           readingStream.value = false
-          feedbackMessage.value = 'Apologies, we seem to have hit a problem. Please try again.'
+          compiledFeedbackMessages.value = [
+            'Apologies, we seem to have hit a problem. Please try again.',
+          ]
+          currentStream.value = ''
           return
         }
 
@@ -146,11 +157,6 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
         console.log('Parsed chunk: ', myChunk)
 
         if (myChunk.type === 'token' && chunk.data) {
-          /*    if (myChunk.data.includes('<CONCLUSION>')) {
-            resetFlow = false
-            continue
-          }
-*/
           if (resetFlow) {
             currentStream.value = chunk.data
             resetFlow = false
@@ -158,13 +164,13 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
             currentStream.value += chunk.data
           }
         }
-
+        /*
         if (myChunk.data?.followUpPrompts) {
           console.log('followUpPrompts', myChunk.data.followUpPrompts)
           currentFollowUpPrompts.value = JSON.parse(
             myChunk.data.followUpPrompts,
           )
-        }
+        }*/
 
         if (myChunk.data.resetFlow) {
           resetFlow = true
@@ -208,8 +214,22 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
       flowState.value = chunk.data.pop().data.state
     }
 
-    if (chunk.event === 'metadata' && chunk.data?.sessionId) {
-      sessionId.value = chunk.data.sessionId
+    if (chunk.event === 'metadata') {
+      const {
+        sessionId = null,
+        chatId = null,
+        chatMessageId = null,
+        followUpPrompts = null,
+      } = chunk.data
+
+      if (followUpPrompts) {
+        console.log('followUpPrompts', followUpPrompts)
+        currentFollowUpPrompts.value = JSON.parse(followUpPrompts)
+      }
+
+      chatMeta.value = { sessionId, chatId, chatMessageId }
+
+      // sessionId.value = chunk.data.sessionId
     }
 
     if (Array.isArray(myChunk.data)) {
@@ -223,6 +243,28 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
         if (theItem.toolName === 'product_recommendation') {
           theItem.isRecommendation = item.args.isRecommendation
           theItem.isShortlist = item.args.isShortlist
+        }
+
+        if (theItem.toolName === 'feedback_handler') {
+          compiledFeedbackMessages.value.push(item.args.feedback)
+        }
+
+        if (theItem.toolName === 'follow_up_questions') {
+          const {
+            question = '',
+            options = '',
+            exclusive = true,
+          } = item.args || {}
+          if (question && options) {
+            followUpQuestions.value.push({
+              question,
+              options: options.split(',').map(item => ({
+                option: item.trim(),
+                selected: false,
+              })),
+              exclusive,
+            })
+          }
         }
 
         return theItem
@@ -246,8 +288,8 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
 
   // compile payload for prediction endpoint
   const predictionPayload = computed(() => {
-    if (sessionId.value) {
-      overrideConfig.value.sessionId = sessionId.value
+    if (chatMeta.value.sessionId) {
+      overrideConfig.value.sessionId = chatMeta.value.sessionId
     }
 
     const body = {
@@ -295,7 +337,7 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
    * @param [config.phone]
    * @return {Promise<void>}
    */
-  const createLead = async config => {
+  const createLead = async (config = {}) => {
     const { email, name = '', phone = '' } = config
 
     const leadPayload = {
@@ -304,7 +346,7 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
       name,
       phone,
       chatflowid: flowId.value,
-      chatId: sessionId.value,
+      chatId: chatMeta.value.sessionId,
       createdDate: new Date().toISOString(),
     }
 
@@ -314,11 +356,43 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
     })
   }
 
+  /**
+   * Store feedback for a chat flow.
+   *
+   * Sends a POST request to the base URL with the feedback payload.
+   *
+   * @param {Object} config - Configuration object for the feedback endpoint.
+   *   @property {boolean|null} isPositive - Whether the rating should be positive (true) or negative (false). Defaults to null.
+   *   @property {string} message - The message to include in the feedback. Defaults to an empty string.
+   *
+   * @returns {Promise<void>} A promise that resolves when the feedback has been sent successfully.
+   */
+  const sendFeedback = async (config = {}) => {
+    const { isPositive = null, message = '', messageId = '' } = config
+
+    const rating = isPositive ? 'THUMBS_UP' : 'THUMBS_DOWN'
+
+    const feedbackPayload = {
+      chatflowid: flowId.value,
+      chatId: chatMeta.value.sessionId,
+      messageId: messageId || chatMeta.value.chatMessageId,
+      rating,
+      content: message,
+      createdDate: new Date().toISOString(),
+    }
+
+    await fetch(`${baseUrl}feedback`, {
+      ...basePayload,
+      body: JSON.stringify(feedbackPayload),
+    })
+  }
+
   return {
     queryFlow,
     createLead,
     streamPrediction,
     resetChat,
+    sendFeedback,
     currentStream,
     currentStreamOutput,
     shortlist,
@@ -329,11 +403,13 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
     feedbackMessage,
     extraInfo,
     compiledFeedbackMessages,
+    followUpQuestions,
     currentChatId,
     question,
     overrideConfig,
     fetching,
     readingStream,
     chatExpanded,
+    chatMeta,
   }
 })
