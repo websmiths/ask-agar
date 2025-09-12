@@ -10,7 +10,7 @@ $brand-light: #f8f9fa;
 
 $brand-danger: color.adjust($brand-primary, $saturation: -20%);
 $brand-success: color.adjust($brand-secondary, $saturation: -5%);
-$brand-warning: color.adjust($brand-tertiary, $saturation: -20%);
+$brand-warning: color.adjust($brand-tertiary, $saturation: 20%, $lightness: -25%);
 $brand-info: #1481d5;
 
 

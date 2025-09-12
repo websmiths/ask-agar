@@ -62,7 +62,7 @@ onMounted(() => {
   // ----- Mouse drag -----
   let dragging = false
 
-  function onMouseDown(e) {
+  function onMouseDown() {
     if (!flowStore.chatExpanded) return
     dragging = true
     container.classList.add('dragging')
@@ -168,10 +168,20 @@ onMounted(() => {
 </template>
 
 <style lang="scss">
+
+@use '../src/assets/scss/mixins' as *;
+
 :root {
   --handle-w: 8px;
   --min-left: 50; /* % */
   --max-left: 85; /* % */
+  --initial-left: 75%;
+  --initial-right: calc(100% - var(--initial-left) - var(--handle-w));
+  --mobile-breakpoint: 600px;
+
+  @media (max-width: 991px) {
+    --initial-left: 60%;
+  }
 }
 
 #flowChat {
@@ -219,13 +229,20 @@ onMounted(() => {
     }
 
     &.chat-expanded {
-      grid-template-columns: 80% var(--handle-w) calc(20% - var(--handle-w));
+      grid-template-columns: var(--initial-left) var(--handle-w) var(--initial-right);
       height: 80vh;
       width: 80vw;
       margin: 0 auto;
       background: #fff;
       padding: 1rem;
       top: 3rem;
+
+      @include mobile {
+        grid-template-rows: var(--initial-left) var(--handle-w) calc(var(--initial-right) - var(--handle-w));
+        grid-template-columns: 100%;
+        height: 90vh;
+        width: 95vw;
+      }
     }
 
     .suggestions,
@@ -247,6 +264,7 @@ onMounted(() => {
     }
 
     #drag-handle {
+
       position: relative;
       width: var(--handle-w);
       cursor: col-resize;
@@ -278,6 +296,12 @@ onMounted(() => {
         border-radius: 1px;
         opacity: 0.6;
         pointer-events: none;
+
+
+        @include mobile {
+          display: none;
+        }
+
       }
 
       &:hover {

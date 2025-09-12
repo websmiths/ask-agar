@@ -34,50 +34,54 @@ const badgeClass = score => {
       {{ product.category }}
     </h6>
 
-    <p v-if="product.image_url">
-      <img
-        :src="product.image_url"
-        :alt="product.name"
-        class="img-fluid"
-      />
-    </p>
-
-    <div
-      v-if="product.url || product.data_sheet_url || product.safety_sheet_url"
-      class="product-links"
-    >
-      <a
-        v-if="product.url"
-        :href="product.url"
-        target="_blank"
-        class="button product-link button-secondary"
+    <div class="product-detail">
+      <figure
+        v-if="product.image_url"
+        class="product-image"
       >
-        <i class="btn-link-icon button-icon" />
-        Product link
-        <i class="external-link-icon button-icon" />
-      </a>
+        <img
+          :src="product.image_url"
+          :alt="product.name"
+        />
+      </figure>
 
-      <a
-        v-if="product.data_sheet_url"
-        :href="product.data_sheet_url"
-        target="_blank"
-        class="button product-link button-secondary"
+      <div
+        v-if="product.url || product.data_sheet_url || product.safety_sheet_url"
+        class="product-links"
       >
-        <i class="btn-link-icon button-icon" />
-        Data sheet
-        <i class="download-icon button-icon" />
-      </a>
+        <a
+          v-if="product.url"
+          :href="product.url"
+          target="_blank"
+          class="button product-link button-secondary"
+        >
+          <i class="btn-link-icon button-icon" />
+          Product link
+          <i class="external-link-icon button-icon" />
+        </a>
 
-      <a
-        v-if="product.safety_sheet_url"
-        :href="product.safety_sheet_url"
-        target="_blank"
-        class="button product-link button-secondary"
-      >
-        <i class="btn-link-icon button-icon" />
-        Safety sheet
-        <i class="download-icon button-icon" />
-      </a>
+        <a
+          v-if="product.data_sheet_url"
+          :href="product.data_sheet_url"
+          target="_blank"
+          class="button product-link button-secondary"
+        >
+          <i class="btn-link-icon button-icon" />
+          Data sheet
+          <i class="download-icon button-icon" />
+        </a>
+
+        <a
+          v-if="product.safety_sheet_url"
+          :href="product.safety_sheet_url"
+          target="_blank"
+          class="button product-link button-secondary"
+        >
+          <i class="btn-link-icon button-icon" />
+          Safety sheet
+          <i class="download-icon button-icon" />
+        </a>
+      </div>
     </div>
   </div>
 </template>
@@ -112,6 +116,33 @@ const badgeClass = score => {
     }
     &.brand-warning {
       --badge-background: var(--brand-warning);
+    }
+  }
+
+  .product-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    @include mixins.mobile {
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+
+      > div {
+        flex: 1;
+      }
+    }
+  }
+
+  .product-image {
+    text-align: center;
+    margin: 0.5em 0;
+    img {
+      max-width: 100%;
+      max-height: 10rem;
+      height: auto;
+      margin: auto;
     }
   }
 
@@ -153,7 +184,7 @@ const badgeClass = score => {
     .download-icon {
       --icon-size: 0.7rem;
       bottom: 0;
-      margin-right: .4rem;
+      margin-right: 0.4rem;
     }
   }
 }

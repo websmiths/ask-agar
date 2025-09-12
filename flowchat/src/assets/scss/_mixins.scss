@@ -1,3 +1,10 @@
+$mobile-breakpoint: 800px;
+@mixin mobile {
+  @media (max-width: #{$mobile-breakpoint}) {
+    @content;
+  }
+}
+
 @mixin flex-header {
   display: flex;
   justify-content: space-between;
@@ -5,12 +12,12 @@
   gap: 1rem;
   border-radius: var(--brand-border-radius) var(--brand-border-radius) 0 0;
 
-  h4, h5, h6 {
+  h4,
+  h5,
+  h6 {
     margin: 0;
   }
-
 }
-
 
 @mixin null-y-margins {
   & > :first-child {
@@ -20,7 +27,6 @@
     margin-bottom: 0;
   }
 }
-
 
 @mixin badge {
   --badge-background: #000;
@@ -36,21 +42,21 @@
 }
 
 @mixin svg-mask-icon {
-    --icon-link: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'></svg>");
-    --icon-size: 1rem;
-    --icon-colour: #fff;
-    --icon-opacity: 1;
+  --icon-link: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'></svg>");
+  --icon-size: 1rem;
+  --icon-colour: #fff;
+  --icon-opacity: 1;
 
-    width: var(--icon-size);
-    height: var(--icon-size);
+  width: var(--icon-size);
+  height: var(--icon-size);
 
-    -webkit-mask: var(--icon-link) no-repeat center;
-    -webkit-mask-size: contain;
-    mask: var(--icon-link) no-repeat center;
-    mask-size: contain;
+  -webkit-mask: var(--icon-link) no-repeat center;
+  -webkit-mask-size: contain;
+  mask: var(--icon-link) no-repeat center;
+  mask-size: contain;
 
-    background-color: var(--icon-colour) !important;
-    background-size: contain;
-    display: inline-block;
-    opacity: var(--icon-opacity);
+  background-color: var(--icon-colour) !important;
+  background-size: contain;
+  display: inline-block;
+  opacity: var(--icon-opacity);
 }

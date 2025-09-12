@@ -191,11 +191,11 @@ dialog {
 .dialog-header {
   @include mixins.flex-header;
   border-radius: var(--dialog-border-radius) var(--dialog-border-radius) 0 0;
-  background-color: var(--brand-grey-light);
+  background-color: var(--brand-primary);
+  color: var(--brand-light);
   padding: 0.5rem 1rem;
 
   h5 {
-    font-size: 1.2rem;
     margin: 0;
     color: var(--brand-light);
   }

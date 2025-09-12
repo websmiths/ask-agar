@@ -24,6 +24,8 @@ const props = defineProps({
   },
 })
 
+const emit = defineEmits(['submit:follow-up'])
+
 const giveFeedback = async isPositive => {
   props.item.feedback = isPositive
   await sendFeedback({
@@ -62,21 +64,24 @@ const giveFeedback = async isPositive => {
 
       <FollowUpQuestions
         v-if="isCurrent && !readingStream"
-        v-bind="$attrs"
+        @submit:follow-up="emit('submit:follow-up', $event)"
       />
     </div>
   </div>
 
-  <div v-if="props.item.answer && props.item.question" class="feedback">
+  <div
+    v-if="props.item.answer && props.item.question"
+    class="feedback"
+  >
     <span
       class="thumbs-up-icon"
-      :class="{submitted: props.item.feedback === true}"
+      :class="{ submitted: props.item.feedback === true }"
       title="Helpful"
       @click="giveFeedback(true)"
     ></span>
     <span
       class="thumbs-down-icon"
-      :class="{submitted: props.item.feedback === false}"
+      :class="{ submitted: props.item.feedback === false }"
       title="Not helpful"
       @click="giveFeedback(false)"
     ></span>
@@ -120,7 +125,6 @@ const giveFeedback = async isPositive => {
         --icon-colour: var(--brand-danger);
       }
     }
-
   }
 }
 </style>

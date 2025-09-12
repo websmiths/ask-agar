@@ -3,7 +3,11 @@ import { useFlowStore } from '@/stores/flow.js'
 import { storeToRefs } from 'pinia'
 const { currentChatId } = storeToRefs(useFlowStore())
 
-const chatIds = [{id: 'ask-agar-claude', label: 'Ask Agar - Claude'}, {id:'j-event-control', label: 'Julian – experiment 2'}]
+const chatIds = [
+  { id: 'ask-agar-claude', label: 'Ask Agar - Claude' },
+  { id: 'ask-agar-openai', label: 'Ask Agar - Open AI' },
+  // { id: 'j-event-control', label: 'Julian – experiment 2' },
+]
 </script>
 
 <template>

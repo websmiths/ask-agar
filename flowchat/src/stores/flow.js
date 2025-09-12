@@ -32,6 +32,7 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
   const currentChatId = shallowRef(chatId)
   const agentFlows = new Map([
     ['ask-agar-claude', '6f41c314-30ab-42e5-ae30-9275cef195d4'],
+    ['ask-agar-openai', 'bbdea5cb-10f8-45e1-8b74-8f39c0be2d1f'],
     ['ask-agar-claude-j', '9a151d62-5dae-4cfd-a8b7-7f903b7a4294'],
     ['j-event-control', '78ff1622-b4ce-4ece-a76f-a653a7bd7be0'],
   ])
@@ -140,11 +141,9 @@ export const useFlowStore = defineStore('flow', (config = {}) => {
           return
         }
 
-        if (
-          chunk.event === 'error' ||
-          (typeof chunk.data === 'string' && /overload|error/i.test(chunk.data))
-        ) {
+        if (chunk.event === 'error') {
           // streamError.value = true
+          console.error('Stream error: ', chunk)
           readingStream.value = false
           compiledFeedbackMessages.value = [
             'Apologies, we seem to have hit a problem. Please try again.',
